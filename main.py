@@ -1,28 +1,25 @@
-
 import os
 from threading import Thread
-from time import sleep
-import pygame
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.lang import Builder
+from kivy.uix import slider
 from kivy.uix.screenmanager import ScreenManager, Screen
-import spidev
-import os
-from time import sleep
-import RPi.GPIO as GPIO
-from pidev.stepper import stepper
-spi = spidev.SpiDev()
+
 from pidev.MixPanel import MixPanel
 from pidev.kivy.PassCodeScreen import PassCodeScreen
 from pidev.kivy.PauseScreen import PauseScreen
 from pidev.kivy import DPEAButton
 from pidev.kivy import ImageButton
-from kivy.animation import Animation
-from kivy.uix.behaviors import ButtonBehavior
-import time
-from kivy.properties import NumericProperty, ReferenceListProperty, ObjectProperty
-from pidev.Joystick import Joystick
+import spidev
+from time import sleep
+import RPi.GPIO as GPIO
+from pidev.stepper import stepper
+
+spi = spidev.SpiDev()
+
+spd = 400
+dir = 1
 
 MIXPANEL_TOKEN = "x"
 MIXPANEL = MixPanel("Project Name", MIXPANEL_TOKEN)
@@ -34,6 +31,10 @@ ADMIN_SCREEN_NAME = 'admin'
 STANFORD_SCREEN_NAME = 'stanford_screen'
 s0 = stepper(port=0, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20,
              steps_per_unit=200, speed=8)
+x = False
+speed = 10
+posCurrent = 0
+runningPreset = False
 
 class ProjectNameGUI(App):
     """
@@ -56,14 +57,53 @@ class MainScreen(Screen):
     Class to handle the main screen and its associated touch events
     """
 
+    def thread_func(self):
+        x = Thread(target = self.pos_update)
+        x.daemon = True
+        x.start()
+
+    def pos_update(self):
+        while runningPreset:
+            ch
+
     def togglePressed(self, label):
         toggle = label
+        global spd
+        global dir
         if toggle == "On":
             self.ids.toggle_text.text = "Off"
-            s0.run(dir, 10)
+            self.MotorOn()
         else:
-            self.ids.toggle_text.text = "Off"
-            s0.softFree()
+            self.ids.toggle_text.text = "On"
+            s0.softStop()
+            s0.free_all()
+
+    def toggleDirPressed(self, label):
+        toggle = label
+        global spd
+        global dir
+        if toggle == "Clockwise":
+            self.ids.toggle_dir_text.text = "Counter Clockwise"
+            dir = 1
+        else:
+            self.ids.toggle_dir_text.text = "Clockwise"
+            dir = 0
+        self.MotorOn()
+
+    def MotorOn(self):
+        global dir
+        global spd
+        if self.ids.toggle_text.text == "Off":
+            spd = (self.ids.slider.value * 10)
+            s0.run(dir, spd)
+
+    def presetPressed(self):
+        global posCurrent
+        s0.set_speed(1)
+        s0.relative_move(15)
+        posCurrent += s0.get_position_in_units()
+
+
 
 
     def pressed(self):
@@ -157,4 +197,3 @@ if __name__ == "__main__":
     # send_event("Project Initialized")
     # Window.fullscreen = 'auto'
     ProjectNameGUI().run()
-

@@ -114,7 +114,7 @@ s0.goTo(6400)
 # The only movement commands which do not have to complete before you can issue another motion command are:
 # s0.goUntilPress() # makes the motor go until a press switch event occurs
 # s0.goUntilRelease() # makes the motor go until a release switch event occurs
-# s0.run() # makes the motor run in a direction and speed - you can use logic such as switch events or other position
+# makes the motor run in a direction and speed - you can use logic such as switch events or other position
 #           data to stop the run command
 #
 # So -why didn't I mention these commands before (goUntilPress, goUntilRelease, run)?
