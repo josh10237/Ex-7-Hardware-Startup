@@ -25,13 +25,13 @@
 
     DPEAButton:
         text: ("Preset")
-        id: toggle_dir_text
+        id: preset_button
         size: 100, 100
         font_size: 18
         x: root.width * .93
         y: root.height * .9
         color: 1, 0, 0, 1
-        on_press: root.presetPressed(self.text)
+        on_press: root.presetPressed()
 
     Slider:
         id: slider
@@ -60,9 +60,9 @@
         color: 0, 0, 0, .5
 
     Label:
-        text: "Position: "+ self.posCurrent
+        text: "Position: 0"
         id: pos_label
         size: 100, 100
         font_size: 30
-        pos_hint:{"y": .9,"x": .9}
+        pos_hint:{"y": .35,"x": .45}
         color: 0, 0, 0, .5

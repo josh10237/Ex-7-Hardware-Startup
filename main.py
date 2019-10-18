@@ -1,5 +1,4 @@
 import os
-from threading import Thread
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.lang import Builder
@@ -36,6 +35,7 @@ speed = 10
 posCurrent = 0
 runningPreset = False
 
+
 class ProjectNameGUI(App):
     """
     Class to handle running the GUI Application
@@ -56,15 +56,6 @@ class MainScreen(Screen):
     """
     Class to handle the main screen and its associated touch events
     """
-
-    def thread_func(self):
-        x = Thread(target = self.pos_update)
-        x.daemon = True
-        x.start()
-
-    def pos_update(self):
-        while runningPreset:
-            ch
 
     def togglePressed(self, label):
         toggle = label
@@ -99,12 +90,37 @@ class MainScreen(Screen):
 
     def presetPressed(self):
         global posCurrent
+        global runningPreset
         s0.set_speed(1)
-        s0.relative_move(15)
-        posCurrent += s0.get_position_in_units()
-
-
-
+        s0.start_relative_move(15)
+        while s0.is_busy():
+            posCurrent = s0.get_position_in_units()
+            self.ids.pos_label.text = "Position: " + str(posCurrent)
+            sleep(.01)
+        sleep(10)
+        s0.set_speed(5)
+        s0.start_relative_move(10)
+        while s0.is_busy():
+            posCurrent = s0.get_position_in_units()
+            self.ids.pos_label.text = "Position: " + str(posCurrent)
+            sleep(.01)
+        sleep(8)
+        s0.goHome()
+        while s0.is_busy():
+            posCurrent = s0.get_position_in_units()
+            self.ids.pos_label.text = "Position: " + str(posCurrent)
+            sleep(.01)
+        sleep(30)
+        s0.set_speed(8)
+        s0.start_relative_move(-100)
+        while s0.is_busy():
+            posCurrent = s0.get_position_in_units()
+            self.ids.pos_label.text = "Position: " + str(posCurrent)
+            sleep(.01)
+        sleep(10)
+        s0.goHome()
+        posCurrent = s0.get_position_in_units()
+        self.ids.pos_label.text = "Position: " + str(posCurrent)
 
     def pressed(self):
         """
