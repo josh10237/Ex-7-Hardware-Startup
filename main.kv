@@ -14,6 +14,16 @@
         on_press: root.togglePressed(self.text)
 
     DPEAButton:
+        text: ("Servo Move")
+        id: servo
+        size: 100, 100
+        font_size: 30
+        x: root.width * 0.5
+        y:root.height * 0.75
+        color: 1, 0, 0, 1
+        on_press: root.servoPressed()
+
+    DPEAButton:
         text: ("Clockwise")
         id: toggle_dir_text
         size: 300, 80

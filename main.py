@@ -14,6 +14,9 @@ import spidev
 from time import sleep
 import RPi.GPIO as GPIO
 from pidev.stepper import stepper
+from Slush.Devices import L6470Registers
+from pidev.Cyprus_Commands import Cyprus_Commands_RPi as cyprus
+spi = spidev.SpiDev()
 
 spi = spidev.SpiDev()
 
@@ -56,6 +59,11 @@ class MainScreen(Screen):
     """
     Class to handle the main screen and its associated touch events
     """
+
+    def servoPressed(self):
+        cyprus.initialize()  # initialize the RPiMIB and establish communication
+        cyprus.setup_servo(1)  # sets up P4 on the RPiMIB as a RC servo style output
+        cyprus.set_servo_position(1,0)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
 
     def togglePressed(self, label):
         toggle = label

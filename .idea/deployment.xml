@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="pi@widget04-pi.local" createEmptyFolders="true" exclude=".svn;.cvs;.idea;.DS_Store;.hg;*.hprof;*.pyc">
+  <component name="PublishConfigData" autoUpload="Always" serverName="pi@widget05-pi.local" createEmptyFolders="true" exclude=".svn;.cvs;.idea;.DS_Store;.hg;*.hprof;*.pyc">
     <serverData>
-      <paths name="pi@widget04-pi.local">
+      <paths name="pi@widget05-pi.local">
         <serverdata>
           <mappings>
             <mapping deploy="/home/pi/Documents/Ex-7-Hardware-Startup" local="$PROJECT_DIR$" />
