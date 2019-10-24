@@ -1,5 +1,6 @@
 import os
 from kivy.app import App
+from threading import Thread
 from kivy.core.window import Window
 from kivy.lang import Builder
 from kivy.uix import slider
@@ -22,6 +23,8 @@ spi = spidev.SpiDev()
 
 spd = 400
 dir = 1
+pos = True
+servThreadPos = True
 
 MIXPANEL_TOKEN = "x"
 MIXPANEL = MixPanel("Project Name", MIXPANEL_TOKEN)
@@ -30,19 +33,19 @@ SCREEN_MANAGER = ScreenManager()
 MAIN_SCREEN_NAME = 'main'
 IMAGE_SCREEN_NAME = 'image_screen'
 ADMIN_SCREEN_NAME = 'admin'
-STANFORD_SCREEN_NAME = 'stanford_screen'
 s0 = stepper(port=0, micro_steps=32, hold_current=20, run_current=20, accel_current=20, deaccel_current=20,
              steps_per_unit=200, speed=8)
 x = False
 speed = 10
 posCurrent = 0
 runningPreset = False
-
+runThread = False
 
 class ProjectNameGUI(App):
     """
     Class to handle running the GUI Application
     """
+
 
     def build(self):
         """
@@ -60,10 +63,48 @@ class MainScreen(Screen):
     Class to handle the main screen and its associated touch events
     """
 
+    def thread_func(self):
+        lol = Thread(target=self.servoSwitch())
+        lol.start()
+
+
     def servoPressed(self):
+        global pos
         cyprus.initialize()  # initialize the RPiMIB and establish communication
-        cyprus.setup_servo(1)  # sets up P4 on the RPiMIB as a RC servo style output
-        cyprus.set_servo_position(1,0)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
+        cyprus.setup_servo(2)  # sets up P4 on the RPiMIB as a RC servo style output
+        if pos:
+            cyprus.set_servo_position(2,0)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
+            pos = False
+        else:
+            cyprus.set_servo_position(2,1)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
+            pos = True
+
+    def servoSwitch(self):
+        global servThreadPos
+        while runThread:
+            cyprus.initialize()  # initialize the RPiMIB and establish communication
+            cyprus.setup_servo(2)  # sets up P4 on the RPiMIB as a RC servo style output
+            if (cyprus.read_gpio() & 0b0001) == 1:
+                sleep(.1)
+                if (cyprus.read_gpio() & 0b0001) == 1:
+                    if servThreadPos:
+                        cyprus.set_servo_position(2, 0)
+                        servThreadPos = False
+            else:
+                cyprus.set_servo_position(2, 1)
+                servThreadPos = True
+            sleep(.1)
+
+    def servoSwitchPressed(self, label):
+        toggle = label
+        global runThread
+        if toggle == "Enable Servo":
+            self.ids.servo_switch.text = "Disable Servo"
+            runThread = True
+        else:
+            self.ids.servo_switch.text = "Enable Servo"
+            runThread = False
+
 
     def togglePressed(self, label):
         toggle = label
