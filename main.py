@@ -17,6 +17,7 @@ import RPi.GPIO as GPIO
 from pidev.stepper import stepper
 from Slush.Devices import L6470Registers
 from pidev.Cyprus_Commands import Cyprus_Commands_RPi as cyprus
+
 spi = spidev.SpiDev()
 
 spi = spidev.SpiDev()
@@ -24,7 +25,6 @@ spi = spidev.SpiDev()
 spd = 400
 dir = 1
 pos = True
-servThreadPos = True
 
 MIXPANEL_TOKEN = "x"
 MIXPANEL = MixPanel("Project Name", MIXPANEL_TOKEN)
@@ -41,11 +41,11 @@ posCurrent = 0
 runningPreset = False
 runThread = False
 
+
 class ProjectNameGUI(App):
     """
     Class to handle running the GUI Application
     """
-
 
     def build(self):
         """
@@ -67,16 +67,15 @@ class MainScreen(Screen):
         lol = Thread(target=self.servoSwitch())
         lol.start()
 
-
     def servoPressed(self):
         global pos
         cyprus.initialize()  # initialize the RPiMIB and establish communication
         cyprus.setup_servo(2)  # sets up P4 on the RPiMIB as a RC servo style output
         if pos:
-            cyprus.set_servo_position(2,0)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
+            cyprus.set_servo_position(1,0)
             pos = False
         else:
-            cyprus.set_servo_position(2,1)  # 1 specifies port P4, 0 is a float from 0-1 that specifies servo position ~(0-180deg)
+            cyprus.set_servo_position(1,1)
             pos = True
 
     def servoSwitch(self):
@@ -85,14 +84,10 @@ class MainScreen(Screen):
             cyprus.initialize()  # initialize the RPiMIB and establish communication
             cyprus.setup_servo(2)  # sets up P4 on the RPiMIB as a RC servo style output
             if (cyprus.read_gpio() & 0b0001) == 1:
-                sleep(.1)
-                if (cyprus.read_gpio() & 0b0001) == 1:
-                    if servThreadPos:
-                        cyprus.set_servo_position(2, 0)
-                        servThreadPos = False
+                cyprus.set_servo_position(1, 0)
             else:
-                cyprus.set_servo_position(2, 1)
-                servThreadPos = True
+                cyprus.set_servo_position(1, 1)
+
             sleep(.1)
 
     def servoSwitchPressed(self, label):
@@ -104,7 +99,6 @@ class MainScreen(Screen):
         else:
             self.ids.servo_switch.text = "Enable Servo"
             runThread = False
-
 
     def togglePressed(self, label):
         toggle = label
