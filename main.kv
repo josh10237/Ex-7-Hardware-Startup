@@ -1,6 +1,5 @@
 <MainScreen>:
     name: 'main'
-    on_enter: root.thread_func()
     FloatLayout:
         size_hint: None, None
 
@@ -25,7 +24,7 @@
         on_press: root.servoPressed()
 
     DPEAButton:
-        text: ("Servo Enabled")
+        text: ("Enable Servo")
         id: servo_switch
         size: 250, 100
         font_size: 15

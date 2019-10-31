@@ -63,9 +63,6 @@ class MainScreen(Screen):
     Class to handle the main screen and its associated touch events
     """
 
-    def thread_func(self):
-        lol = Thread(target=self.servoSwitch())
-        lol.start()
 
     def servoPressed(self):
         global pos
@@ -79,16 +76,16 @@ class MainScreen(Screen):
             pos = True
 
     def servoSwitch(self):
-        global servThreadPos
+        global runThread
         while runThread:
-            cyprus.initialize()  # initialize the RPiMIB and establish communication
-            cyprus.setup_servo(2)  # sets up P4 on the RPiMIB as a RC servo style output
             if (cyprus.read_gpio() & 0b0001) == 1:
-                cyprus.set_servo_position(1, 0)
+                sleep(.1)
+                if (cyprus.read_gpio() & 0b0001) == 1:
+                    cyprus.set_servo_position(1, 0)
+                    print("1")
             else:
                 cyprus.set_servo_position(1, 1)
-
-            sleep(.1)
+                print("2")
 
     def servoSwitchPressed(self, label):
         toggle = label
@@ -96,9 +93,11 @@ class MainScreen(Screen):
         if toggle == "Enable Servo":
             self.ids.servo_switch.text = "Disable Servo"
             runThread = True
+            print("p1")
         else:
             self.ids.servo_switch.text = "Enable Servo"
             runThread = False
+            print("p2")
 
     def togglePressed(self, label):
         toggle = label
