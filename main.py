@@ -51,13 +51,15 @@ class MainScreen(Screen):
     Class to handle the main screen and its associated touch events
     """
     global pos
+    global cytron
     global servo
     global talon
     pos = False
     servo = False
     talon = False
-    global riseup
-    riseup = 1
+    cytron = False
+    global togServo
+    togServo = 1
     def servoThread(self):
         global servo
         while servo:
@@ -78,26 +80,49 @@ class MainScreen(Screen):
                     cyprus.set_servo_position(1, 1)
             else:
                 cyprus.set_servo_position(1, .5)
+    def cytronThread(self):
+        global cytron
+        while cytron:
+            if (cyprus.read_gpio() & 0b0001):
+                sleep(.1)
+                if (cyprus.read_gpio() & 0b0001):
+                    cyprus.set_pwm_values(1, period_value=100000, compare_value=50000,
+                                          compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+                    cyprus.set_servo_position(1, 1)
+            else:
+                cyprus.set_servo_position(1, .5)
+
     def toggleServoSwitch(self):
         global servo
         if(servo == False):
-            self.ids.toggle_servo_switch.text = "Servo Switch On"
+            self.ids.toggle_servo_switch.text = "Direction Switch On"
             servo = True
             Thread(target=self.servoThread).start()
             Thread.daemon = True
         else:
-            self.ids.toggle_servo_switch.text = "Servo Switch Off"
+            self.ids.toggle_servo_switch.text = "Direction Switch Off"
             servo = False
     def toggleTalonSwitch(self):
         global talon
         if(talon == False):
-            self.ids.toggle_talon_switch.text = "Talon Switch Off"
+            self.ids.toggle_talon_switch.text = "Stop Switch On"
             talon = True
             Thread(target=self.talonThread).start()
             Thread.daemon = True
         else:
-            self.ids.toggle_talon_switch.text = "Talon Switch On"
+            self.ids.toggle_talon_switch.text = "Stop Switch Off"
             talon = False
+
+    def toggleProximity(self):
+        global cytron
+        if(cytron == False):
+            self.ids.toggle_talon_switch.text = "Proximity Switch On"
+            cytron = True
+            Thread(target=self.cytronThread).start()
+            Thread.daemon = True
+        else:
+            self.ids.toggle_talon_switch.text = "Proximity Switch Off"
+            cytron = False
 
     def servoPressed(self):
         global pos
@@ -115,14 +140,14 @@ class MainScreen(Screen):
         Function called on button touch event for button with id: testButton
         :return: None
         """
-        global riseup
-        if(riseup == 1):
+        global togServo
+        if(togServo == 1):
             cyprus.set_servo_position(1, 0)
-            riseup = 0
+            togServo = 0
             # 2 specifies port P5, i is a float that specifies speed
         else:
             cyprus.set_servo_position(1, 1)
-            riseup = 1
+            togServo = 1
 
 
     def cleanup(self):

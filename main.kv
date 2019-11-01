@@ -14,27 +14,34 @@
         on_press: root.cleanup()
     DPEAButton:
         id:toggle_servo_switch
-        text: "Servo Switch Off"
-        size: 300, 100
+        text: "Direction Switch Off"
+        size: 400, 100
         x: root.width * 0.25
         y:root.height * 0.5
-        color: 1, 0, 0, 1
+        color: 0, 1, 0, 1
         on_press: root.toggleServoSwitch()
     DPEAButton:
         text: ("Servo Move")
         id: servo
-        size: 300, 100
+        size: 400, 100
         font_size: 15
         x: root.width * 0.25
         y:root.height * 0.3
-        color: 1, 0, 0, 1
+        color: 0, 0, 1, 1
         on_press: root.servoPressed()
     DPEAButton:
         id:toggle_talon_switch
-        text: "Talon Switch Off"
-        size: 300, 100
+        text: "Stop Switch Off"
+        size: 400, 100
         x: root.width * 0.5
         y:root.height * 0.5
-        color: 1, 0, 0, 1
+        color: 1, 1, 0, 1
         on_press: root.toggleTalonSwitch()
-
+    DPEAButton:
+        id:toggle_proximity
+        text: "Proximity Switch Off"
+        size: 400, 100
+        x: root.width * 0.5
+        y:root.height * 0.3
+        color: 1, 0, 1, 1
+        on_press: root.togglePromixmity()
