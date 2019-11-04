@@ -28,8 +28,6 @@ ADMIN_SCREEN_NAME = 'admin'
 cyprus.initialize()
 
 
-#cyprus.setup_servo(1)
-
 class ProjectNameGUI(App):
     """
     Class to handle running the GUI Application
@@ -69,6 +67,7 @@ class MainScreen(Screen):
                     cyprus.set_servo_position(1, 0)
             else:
                 cyprus.set_servo_position(1, 1)
+
     def talonThread(self):
         global talon
         while talon:
@@ -80,17 +79,21 @@ class MainScreen(Screen):
                     cyprus.set_servo_position(1, 1)
             else:
                 cyprus.set_servo_position(1, .5)
+
     def cytronThread(self):
         global cytron
         while cytron:
-            if (cyprus.read_gpio() & 0b0001):
-                sleep(.1)
-                if (cyprus.read_gpio() & 0b0001):
-                    cyprus.set_pwm_values(1, period_value=100000, compare_value=50000,
+            if (cyprus.read_gpio() & 0b0010):
+                cyprus.set_pwm_values(1, period_value=100000, compare_value=50000,
                                           compare_mode=cyprus.LESS_THAN_OR_EQUAL)
-                    cyprus.set_servo_position(1, 1)
+                sleep(.1)
+                print("yeepie")
             else:
-                cyprus.set_servo_position(1, .5)
+                cyprus.set_pwm_values(1, period_value=100000, compare_value=0,
+                                      compare_mode=cyprus.LESS_THAN_OR_EQUAL)
+                sleep(.1)
+                print("yeepie 1")
+
 
     def toggleServoSwitch(self):
         global servo
@@ -115,14 +118,15 @@ class MainScreen(Screen):
 
     def toggleProximity(self):
         global cytron
-        if(cytron == False):
-            self.ids.toggle_talon_switch.text = "Proximity Switch On"
+        if cytron == False:
+            self.ids.toggle_proximity.text = "Proximity Switch On"
             cytron = True
             Thread(target=self.cytronThread).start()
             Thread.daemon = True
         else:
-            self.ids.toggle_talon_switch.text = "Proximity Switch Off"
+            self.ids.toggle_proximity.text = "Proximity Switch Off"
             cytron = False
+
 
     def servoPressed(self):
         global pos
